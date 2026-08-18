@@ -160,11 +160,8 @@ namespace Sekai
 			if (addScore > 0 && addScoreRoot != null)
 			{
 				addScoreRoot.localScale = inverseScale ? new Vector3(1f, -1f, 1f) : Vector3.one;
-				if (addScoreSequence == null)
-				{
-					CreateAddScoreAnimation();
-				}
-				addScoreSequence?.Restart();
+				CreateAddScoreAnimation();
+				addScoreSequence?.Play();
 				if (addScoreNumber != null)
 				{
 					addScoreNumber.UpdateNumber(addScore);
