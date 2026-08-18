@@ -263,10 +263,26 @@ namespace Sekai.Core.Live
 				}
 				if (note.MusicScoreInfo.time > currentFrameInfo.time)
 				{
-					return;
+					break;
 				}
 				note.AutoJudgment(currentFrameInfo);
 				index++;
+			}
+			int highSpeedIndex = highSpeedNoteStartIndex;
+			while (highSpeedIndex < highSpeedNoteArray.Length)
+			{
+				NoteBase note = highSpeedNoteArray[highSpeedIndex];
+				if (note == null || note.State == NoteState.Done)
+				{
+					highSpeedIndex++;
+					continue;
+				}
+				if (note.MusicScoreInfo.time > currentFrameInfo.time)
+				{
+					break;
+				}
+				note.AutoJudgment(currentFrameInfo);
+				highSpeedIndex++;
 			}
 		}
 
