@@ -16,14 +16,10 @@ namespace Sekai.CustomMusicScoreManager
 {
 	public sealed class ScreenLayerCustomMusicScoreManager : ScreenLayer
 	{
-		private const string BaseFontEbPath = "font/FOT-RodinNTLGPro-EB SDF_Base";
+		public override bool EnableBlur => false;
 
-		private const string DynamicFontEbPath = "font/FOT-RodinNTLGPro-EB SDF_Dynamic";
-
-		private const string BaseFontDbPath = "font/FOT-RodinNTLGPro-DB SDF_Base";
-
-		private const string DynamicFontDbPath = "font/FOT-RodinNTLGPro-DB SDF_Dynamic";
-
+		[SerializeField]
+		private RowView rowViewPrefab;
 		private const int MaxManifestFieldColumnCount = 3;
 
 		private const float ManifestFieldMinWidth = 300f;
@@ -87,12 +83,6 @@ namespace Sekai.CustomMusicScoreManager
 			"MASTER",
 			"APPEND"
 		};
-
-		private static TMP_FontAsset _baseFontEB;
-
-		private static TMP_FontAsset _baseFontDB;
-
-		private static bool _fontAssetSetup;
 
 		private readonly List<RowView> _rows = new List<RowView>();
 		private RectTransform _listContent;
@@ -211,11 +201,11 @@ namespace Sekai.CustomMusicScoreManager
 			RectTransform topBar = CreatePanel("TopBar", root, new Color32(31, 37, 45, 255));
 			SetStretchTop(topBar, 0f, 0f, 0f, 108f);
 
-			TextMeshProUGUI title = CreateText("Title", topBar, $"Open Sekai {Application.version}", 40, FontStyles.Bold, TextAlignmentOptions.Left);
-			SetAnchor(title.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(36f, 0f), new Vector2(560f, 0f));
+			TextMeshProUGUI title = UI.CreateText("Title", topBar, $"Open Sekai {Application.version}", 40, FontStyles.Bold, TextAlignmentOptions.Left);
+			UI.SetAnchor(title.rectTransform, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(36f, 0f), new Vector2(560f, 0f));
 
 			RectTransform toolbar = CreateRect("Toolbar", topBar);
-			SetAnchor(toolbar, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(-36f, 0f), new Vector2(980f, 0f));
+			UI.SetAnchor(toolbar, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(-36f, 0f), new Vector2(980f, 0f));
 			HorizontalLayoutGroup toolbarLayout = toolbar.gameObject.AddComponent<HorizontalLayoutGroup>();
 			toolbarLayout.childAlignment = TextAnchor.MiddleRight;
 			toolbarLayout.childControlWidth = false;
@@ -230,17 +220,17 @@ namespace Sekai.CustomMusicScoreManager
 			SetStretchOffsets(body, 28f, 28f, 28f, 136f);
 
 			RectTransform listPanel = CreatePanel("ListPanel", body, new Color32(26, 31, 38, 255));
-			SetAnchor(listPanel, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(28f, 0f), new Vector2(620f, 0f));
+			UI.SetAnchor(listPanel, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(28f, 0f), new Vector2(620f, 0f));
 
 			RectTransform listHeader = CreateRect("ListHeader", listPanel);
 			SetStretchTop(listHeader, 18f, 20f, 18f, 50f);
-			TextMeshProUGUI listTitle = CreateText("ListTitle", listHeader, "本地谱面", 26, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI listTitle = UI.CreateText("ListTitle", listHeader, "本地谱面", 26, FontStyles.Bold, TextAlignmentOptions.Left);
 			Stretch(listTitle.rectTransform);
 
 			ScrollRect scrollRect = CreateScrollRect("ScoreScroll", listPanel, out _listContent);
 			SetStretchOffsets(scrollRect.GetComponent<RectTransform>(), 16f, 16f, 16f, 88f);
 
-			_emptyText = CreateText("EmptyText", listPanel, "暂无本地谱面", 24, FontStyles.Normal, TextAlignmentOptions.Center);
+			_emptyText = UI.CreateText("EmptyText", listPanel, "暂无本地谱面", 24, FontStyles.Normal, TextAlignmentOptions.Center);
 			SetStretchOffsets(_emptyText.rectTransform, 28f, 100f, 28f, 100f);
 
 			RectTransform detailPanel = CreatePanel("DetailPanel", body, new Color32(28, 34, 42, 255));
@@ -248,20 +238,20 @@ namespace Sekai.CustomMusicScoreManager
 			SetStretchOffsets(detailPanel, 688f, 0f, 0f, 0f);
 
 			_jacketImage = CreateImage("Jacket", detailPanel, new Color32(42, 49, 58, 255));
-			SetAnchor(_jacketImage.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(28f, -28f), new Vector2(200f, 200f));
+			UI.SetAnchor(_jacketImage.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(28f, -28f), new Vector2(200f, 200f));
 			_jacketImage.preserveAspect = true;
 
-			_detailTitle = CreateText("DetailTitle", detailPanel, "请选择谱面", 38, FontStyles.Bold, TextAlignmentOptions.Left);
+			_detailTitle = UI.CreateText("DetailTitle", detailPanel, "请选择谱面", 38, FontStyles.Bold, TextAlignmentOptions.Left);
 			SetStretchTop(_detailTitle.rectTransform, 252f, 30f, 30f, 54f);
 
-			_detailMeta = CreateText("DetailMeta", detailPanel, string.Empty, 22, FontStyles.Normal, TextAlignmentOptions.Left);
+			_detailMeta = UI.CreateText("DetailMeta", detailPanel, string.Empty, 22, FontStyles.Normal, TextAlignmentOptions.Left);
 			SetStretchTop(_detailMeta.rectTransform, 252f, 88f, 30f, 88f);
 
-			_detailStatus = CreateText("DetailStatus", detailPanel, string.Empty, 22, FontStyles.Bold, TextAlignmentOptions.Left);
+			_detailStatus = UI.CreateText("DetailStatus", detailPanel, string.Empty, 22, FontStyles.Bold, TextAlignmentOptions.Left);
 			SetStretchTop(_detailStatus.rectTransform, 252f, 184f, 30f, 38f);
 
 			_bestResultPanel = CreatePanel("BestResult", detailPanel, new Color32(22, 27, 34, 255));
-			SetAnchor(_bestResultPanel, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-BestResultRight, -BestResultTop), new Vector2(BestResultPreferredWidth, BestResultHeight));
+			UI.SetAnchor(_bestResultPanel, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-BestResultRight, -BestResultTop), new Vector2(BestResultPreferredWidth, BestResultHeight));
 			VerticalLayoutGroup bestResultLayout = _bestResultPanel.gameObject.AddComponent<VerticalLayoutGroup>();
 			bestResultLayout.padding = new RectOffset(18, 18, 14, 14);
 			bestResultLayout.spacing = 6f;
@@ -269,7 +259,7 @@ namespace Sekai.CustomMusicScoreManager
 			bestResultLayout.childControlHeight = true;
 			bestResultLayout.childForceExpandWidth = true;
 			bestResultLayout.childForceExpandHeight = false;
-			TextMeshProUGUI bestResultTitle = CreateText("Title", _bestResultPanel, "最佳成绩", 22, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI bestResultTitle = UI.CreateText("Title", _bestResultPanel, "最佳成绩", 22, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement bestResultTitleLayout = bestResultTitle.gameObject.AddComponent<LayoutElement>();
 			bestResultTitleLayout.minHeight = 30f;
 			bestResultTitleLayout.preferredHeight = 30f;
@@ -283,11 +273,11 @@ namespace Sekai.CustomMusicScoreManager
 			bestResultContentGroup.childControlHeight = true;
 			bestResultContentGroup.childForceExpandWidth = true;
 			bestResultContentGroup.childForceExpandHeight = true;
-			_bestResultLeftText = CreateText("LeftText", bestResultContent, string.Empty, 18, FontStyles.Normal, TextAlignmentOptions.Left);
+			_bestResultLeftText = UI.CreateText("LeftText", bestResultContent, string.Empty, 18, FontStyles.Normal, TextAlignmentOptions.Left);
 			_bestResultLeftText.enableWordWrapping = false;
 			_bestResultLeftText.overflowMode = TextOverflowModes.Overflow;
 			_bestResultLeftText.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
-			_bestResultRightText = CreateText("RightText", bestResultContent, string.Empty, 18, FontStyles.Normal, TextAlignmentOptions.Left);
+			_bestResultRightText = UI.CreateText("RightText", bestResultContent, string.Empty, 18, FontStyles.Normal, TextAlignmentOptions.Left);
 			_bestResultRightText.enableWordWrapping = false;
 			_bestResultRightText.overflowMode = TextOverflowModes.Overflow;
 			_bestResultRightText.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
@@ -358,7 +348,7 @@ namespace Sekai.CustomMusicScoreManager
 			saveRowGroup.childForceExpandHeight = false;
 			saveRowGroup.childAlignment = TextAnchor.MiddleLeft;
 			_saveManifestButton = CreateButton("SaveManifestButton", saveRow, "保存配置", SaveSelectedManifest, 230f, 58f);
-			_statusText = CreateText("StatusText", saveRow, string.Empty, 21, FontStyles.Normal, TextAlignmentOptions.Right);
+			_statusText = UI.CreateText("StatusText", saveRow, string.Empty, 21, FontStyles.Normal, TextAlignmentOptions.Right);
 			_statusText.raycastTarget = false;
 			LayoutElement statusLayout = _statusText.gameObject.AddComponent<LayoutElement>();
 			statusLayout.flexibleWidth = 1f;
@@ -376,7 +366,7 @@ namespace Sekai.CustomMusicScoreManager
 			_settingsOverlay.gameObject.SetActive(false);
 
 			RectTransform dialog = CreatePanel("SettingsDialog", _settingsOverlay, new Color32(31, 37, 45, 255));
-			SetAnchor(dialog, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(760f, 960f));
+			UI.SetAnchor(dialog, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(760f, 960f));
 
 			VerticalLayoutGroup dialogLayout = dialog.gameObject.AddComponent<VerticalLayoutGroup>();
 			dialogLayout.padding = new RectOffset(32, 32, 32, 32);
@@ -386,7 +376,7 @@ namespace Sekai.CustomMusicScoreManager
 			dialogLayout.childForceExpandWidth = true;
 			dialogLayout.childForceExpandHeight = false;
 
-			TextMeshProUGUI title = CreateText("Title", dialog, "设置", 36, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI title = UI.CreateText("Title", dialog, "设置", 36, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement titleLayout = title.gameObject.AddComponent<LayoutElement>();
 			titleLayout.preferredHeight = 46f;
 
@@ -574,7 +564,7 @@ namespace Sekai.CustomMusicScoreManager
 			rowGroup.childForceExpandWidth = false;
 			rowGroup.childForceExpandHeight = false;
 
-			TextMeshProUGUI title = CreateText("Label", row, "Note皮肤", 24, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI title = UI.CreateText("Label", row, "Note皮肤", 24, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement titleLayout = title.gameObject.AddComponent<LayoutElement>();
 			titleLayout.preferredWidth = 180f;
 			titleLayout.minWidth = 180f;
@@ -615,7 +605,7 @@ namespace Sekai.CustomMusicScoreManager
 			rowGroup.childForceExpandWidth = false;
 			rowGroup.childForceExpandHeight = false;
 
-			TextMeshProUGUI title = CreateText("Label", row, "Note音效", 24, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI title = UI.CreateText("Label", row, "Note音效", 24, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement titleLayout = title.gameObject.AddComponent<LayoutElement>();
 			titleLayout.preferredWidth = 180f;
 			titleLayout.minWidth = 180f;
@@ -656,7 +646,7 @@ namespace Sekai.CustomMusicScoreManager
 			rowGroup.childForceExpandWidth = false;
 			rowGroup.childForceExpandHeight = false;
 
-			TextMeshProUGUI title = CreateText("Label", row, "击打特效", 24, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI title = UI.CreateText("Label", row, "击打特效", 24, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement titleLayout = title.gameObject.AddComponent<LayoutElement>();
 			titleLayout.preferredWidth = 180f;
 			titleLayout.minWidth = 180f;
@@ -697,7 +687,7 @@ namespace Sekai.CustomMusicScoreManager
 			rowGroup.childForceExpandWidth = false;
 			rowGroup.childForceExpandHeight = false;
 
-			TextMeshProUGUI title = CreateText("Label", row, "多押提示线", 24, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI title = UI.CreateText("Label", row, "多押提示线", 24, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement titleLayout = title.gameObject.AddComponent<LayoutElement>();
 			titleLayout.preferredWidth = 180f;
 			titleLayout.minWidth = 180f;
@@ -738,7 +728,7 @@ namespace Sekai.CustomMusicScoreManager
 			rowGroup.childForceExpandWidth = false;
 			rowGroup.childForceExpandHeight = false;
 
-			TextMeshProUGUI title = CreateText("Label", row, "MusicInfo显示", 24, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI title = UI.CreateText("Label", row, "MusicInfo显示", 24, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement titleLayout = title.gameObject.AddComponent<LayoutElement>();
 			titleLayout.preferredWidth = 180f;
 			titleLayout.minWidth = 180f;
@@ -786,7 +776,7 @@ namespace Sekai.CustomMusicScoreManager
 			rowGroup.childForceExpandWidth = false;
 			rowGroup.childForceExpandHeight = false;
 
-			TextMeshProUGUI title = CreateText("Label", row, "Live背景", 24, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI title = UI.CreateText("Label", row, "Live背景", 24, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement titleLayout = title.gameObject.AddComponent<LayoutElement>();
 			titleLayout.preferredWidth = 180f;
 			titleLayout.minWidth = 180f;
@@ -834,7 +824,7 @@ namespace Sekai.CustomMusicScoreManager
 			rowGroup.childForceExpandWidth = false;
 			rowGroup.childForceExpandHeight = false;
 
-			TextMeshProUGUI title = CreateText("Label", row, "判定偏差显示", 24, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI title = UI.CreateText("Label", row, "判定偏差显示", 24, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement titleLayout = title.gameObject.AddComponent<LayoutElement>();
 			titleLayout.preferredWidth = 180f;
 			titleLayout.minWidth = 180f;
@@ -876,7 +866,7 @@ namespace Sekai.CustomMusicScoreManager
 			rowGroup.childForceExpandWidth = false;
 			rowGroup.childForceExpandHeight = false;
 
-			TextMeshProUGUI title = CreateText("Label", row, "桌面全屏", 24, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI title = UI.CreateText("Label", row, "桌面全屏", 24, FontStyles.Bold, TextAlignmentOptions.Left);
 			LayoutElement titleLayout = title.gameObject.AddComponent<LayoutElement>();
 			titleLayout.preferredWidth = 180f;
 			titleLayout.minWidth = 180f;
@@ -911,7 +901,7 @@ namespace Sekai.CustomMusicScoreManager
 #endif
 		}
 
-		private void UpdateManifestFieldLayout()
+    private void UpdateManifestFieldLayout()
 		{
 			if (_manifestFieldGrid == null || _manifestFieldLayout == null)
 			{
@@ -1048,7 +1038,7 @@ namespace Sekai.CustomMusicScoreManager
 				return;
 			}
 
-			SetAnchor(_bestResultPanel, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-BestResultRight, -BestResultTop), new Vector2(bestWidth, BestResultHeight));
+			UI.SetAnchor(_bestResultPanel, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-BestResultRight, -BestResultTop), new Vector2(bestWidth, BestResultHeight));
 		}
 
 		private static int CalculateManifestColumnCount(float availableWidth)
@@ -1070,16 +1060,15 @@ namespace Sekai.CustomMusicScoreManager
 			_items = CustomMusicScoreManagerService.LoadItems();
 			foreach (RowView row in _rows)
 			{
-				if (row.Root != null)
-				{
-					Destroy(row.Root);
-				}
+				row.Unload();
 			}
 			_rows.Clear();
 
 			foreach (CustomMusicScoreManagerItem item in _items)
 			{
-				RowView row = CreateRow(_listContent, item);
+				RowView row = Instantiate(rowViewPrefab, _listContent);
+				row.Setup(item);
+				row.Background.GetComponent<Button>().onClick.AddListener(() => UpdateSelection(item));
 				_rows.Add(row);
 			}
 
@@ -1099,44 +1088,6 @@ namespace Sekai.CustomMusicScoreManager
 			}
 			UpdateSelection(selected ?? (_items.Count > 0 ? _items[0] : null));
 			SetStatus("已加载 " + _items.Count.ToString(CultureInfo.InvariantCulture) + " 个谱面。");
-		}
-
-		private RowView CreateRow(RectTransform parent, CustomMusicScoreManagerItem item)
-		{
-			GameObject root = new GameObject("EntryCell", typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
-			root.transform.SetParent(parent, false);
-			RectTransform rect = root.GetComponent<RectTransform>();
-			rect.sizeDelta = new Vector2(0f, 116f);
-			LayoutElement layout = root.GetComponent<LayoutElement>();
-			layout.preferredHeight = 116f;
-			layout.minHeight = 116f;
-
-			Image image = root.GetComponent<Image>();
-			image.color = new Color32(39, 46, 55, 255);
-			Button button = root.GetComponent<Button>();
-			button.targetGraphic = image;
-			button.onClick.AddListener(() => UpdateSelection(item));
-
-			TextMeshProUGUI title = CreateText("Title", rect, item.Entry.Manifest.scoreTitle, 26, FontStyles.Bold, TextAlignmentOptions.Left);
-			SetAnchor(title.rectTransform, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, 1f), new Vector2(22f, -14f), new Vector2(-44f, 36f));
-
-			string metaText = item.Entry.Manifest.title;
-			if (!string.IsNullOrEmpty(item.Entry.Manifest.userName))
-			{
-				metaText += "  " + item.Entry.Manifest.userName;
-			}
-			if (!string.IsNullOrEmpty(item.Entry.Manifest.musicDifficultyType))
-			{
-				metaText += "  " + item.Entry.Manifest.musicDifficultyType.ToUpperInvariant();
-			}
-			TextMeshProUGUI meta = CreateText("Meta", rect, metaText, 20, FontStyles.Normal, TextAlignmentOptions.Left);
-			SetAnchor(meta.rectTransform, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(22f, 16f), new Vector2(-210f, 30f));
-
-			TextMeshProUGUI status = CreateText("Status", rect, item.StatusText, 20, FontStyles.Bold, TextAlignmentOptions.Right);
-			SetAnchor(status.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-22f, 16f), new Vector2(178f, 30f));
-			status.color = item.HasAudio && item.HasScore ? new Color32(126, 221, 166, 255) : new Color32(255, 184, 100, 255);
-
-			return new RowView(root, image, item);
 		}
 
 		private void UpdateSelection(CustomMusicScoreManagerItem item)
@@ -2099,7 +2050,7 @@ namespace Sekai.CustomMusicScoreManager
 			vertical.childControlWidth = true;
 			vertical.childControlHeight = false;
 
-			TextMeshProUGUI labelText = CreateText("Label", root.transform, "难度", 23, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI labelText = UI.CreateText("Label", root.transform, "难度", 23, FontStyles.Bold, TextAlignmentOptions.Left);
 			labelText.rectTransform.sizeDelta = new Vector2(0f, 30f);
 
 			GameObject fieldObject = new GameObject("Field", typeof(RectTransform), typeof(Image), typeof(Button));
@@ -2120,13 +2071,13 @@ namespace Sekai.CustomMusicScoreManager
 			button.colors = colors;
 			button.onClick.AddListener(CycleDifficulty);
 
-			_difficultyLabel = CreateText("Label", _difficultyFieldRect, string.Empty, 26, FontStyles.Normal, TextAlignmentOptions.Left);
+			_difficultyLabel = UI.CreateText("Label", _difficultyFieldRect, string.Empty, 26, FontStyles.Normal, TextAlignmentOptions.Left);
 			_difficultyLabel.raycastTarget = false;
 			SetStretchOffsets(_difficultyLabel.rectTransform, 18f, 0f, 124f, 0f);
 
-			TextMeshProUGUI hint = CreateText("Hint", _difficultyFieldRect, "切换", 19, FontStyles.Bold, TextAlignmentOptions.Center);
+			TextMeshProUGUI hint = UI.CreateText("Hint", _difficultyFieldRect, "切换", 19, FontStyles.Bold, TextAlignmentOptions.Center);
 			hint.raycastTarget = false;
-			SetAnchor(hint.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(-14f, 0f), new Vector2(104f, 0f));
+			UI.SetAnchor(hint.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(-14f, 0f), new Vector2(104f, 0f));
 			SetDifficultyDropdownValue("master");
 			return button;
 		}
@@ -2155,7 +2106,7 @@ namespace Sekai.CustomMusicScoreManager
 			vertical.childControlWidth = true;
 			vertical.childControlHeight = false;
 
-			TextMeshProUGUI labelText = CreateText("Label", root.transform, label, 23, FontStyles.Bold, TextAlignmentOptions.Left);
+			TextMeshProUGUI labelText = UI.CreateText("Label", root.transform, label, 23, FontStyles.Bold, TextAlignmentOptions.Left);
 			labelText.rectTransform.sizeDelta = new Vector2(0f, 30f);
 
 			GameObject fieldObject = new GameObject("Field", typeof(RectTransform), typeof(Image), typeof(TMP_InputField));
@@ -2168,11 +2119,11 @@ namespace Sekai.CustomMusicScoreManager
 			textArea.gameObject.AddComponent<RectMask2D>();
 			SetStretchOffsets(textArea, 14f, 7f, onClick == null ? 14f : 126f, 7f);
 
-			TextMeshProUGUI text = CreateText("Text", textArea, string.Empty, 26, FontStyles.Normal, TextAlignmentOptions.Left);
+			TextMeshProUGUI text = UI.CreateText("Text", textArea, string.Empty, 26, FontStyles.Normal, TextAlignmentOptions.Left);
 			SetStretchOffsets(text.rectTransform, 4f, 0f, 4f, 0f);
 			text.raycastTarget = false;
 
-			TextMeshProUGUI placeholderText = CreateText("Placeholder", textArea, placeholder, 26, FontStyles.Normal, TextAlignmentOptions.Left);
+			TextMeshProUGUI placeholderText = UI.CreateText("Placeholder", textArea, placeholder, 26, FontStyles.Normal, TextAlignmentOptions.Left);
 			SetStretchOffsets(placeholderText.rectTransform, 4f, 0f, 4f, 0f);
 			placeholderText.color = new Color32(136, 146, 158, 180);
 			placeholderText.raycastTarget = false;
@@ -2182,7 +2133,7 @@ namespace Sekai.CustomMusicScoreManager
 				GameObject actionObject = new GameObject("SelectButton", typeof(RectTransform), typeof(Image), typeof(Button));
 				actionObject.transform.SetParent(fieldRect, false);
 				RectTransform actionRect = actionObject.GetComponent<RectTransform>();
-				SetAnchor(actionRect, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(-7f, 0f), new Vector2(110f, -14f));
+				UI.SetAnchor(actionRect, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(-7f, 0f), new Vector2(110f, -14f));
 
 				Image actionImage = actionObject.GetComponent<Image>();
 				actionImage.color = new Color32(62, 78, 92, 255);
@@ -2197,7 +2148,7 @@ namespace Sekai.CustomMusicScoreManager
 				actionButton.colors = colors;
 				actionButton.onClick.AddListener(onClick);
 
-				TextMeshProUGUI actionLabel = CreateText("Label", actionRect, "导入", 20, FontStyles.Bold, TextAlignmentOptions.Center);
+				TextMeshProUGUI actionLabel = UI.CreateText("Label", actionRect, "导入", 20, FontStyles.Bold, TextAlignmentOptions.Center);
 				actionLabel.enableWordWrapping = false;
 				actionLabel.overflowMode = TextOverflowModes.Ellipsis;
 				Stretch(actionLabel.rectTransform);
@@ -2237,7 +2188,7 @@ namespace Sekai.CustomMusicScoreManager
 			button.colors = colors;
 			button.onClick.AddListener(onClick);
 
-			TextMeshProUGUI text = CreateText("Label", buttonRect, label, 20, FontStyles.Bold, TextAlignmentOptions.Center);
+			TextMeshProUGUI text = UI.CreateText("Label", buttonRect, label, 20, FontStyles.Bold, TextAlignmentOptions.Center);
 			text.enableWordWrapping = false;
 			text.overflowMode = TextOverflowModes.Ellipsis;
 			Stretch(text.rectTransform);
@@ -2267,7 +2218,7 @@ namespace Sekai.CustomMusicScoreManager
 			button.colors = colors;
 			button.onClick.AddListener(onClick);
 
-			TextMeshProUGUI text = CreateText("Label", rect, label, 20, FontStyles.Bold, TextAlignmentOptions.Center);
+			TextMeshProUGUI text = UI.CreateText("Label", rect, label, 20, FontStyles.Bold, TextAlignmentOptions.Center);
 			text.enableWordWrapping = false;
 			text.overflowMode = TextOverflowModes.Ellipsis;
 			Stretch(text.rectTransform);
@@ -2383,66 +2334,6 @@ namespace Sekai.CustomMusicScoreManager
 			return image;
 		}
 
-		private static TextMeshProUGUI CreateText(string name, Transform parent, string text, float fontSize, FontStyles style, TextAlignmentOptions alignment)
-		{
-			GameObject go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
-			go.transform.SetParent(parent, false);
-			TextMeshProUGUI tmp = go.GetComponent<TextMeshProUGUI>();
-			TMP_FontAsset fontAsset = GetOriginalFontAsset(style);
-			if (fontAsset != null)
-			{
-				tmp.font = fontAsset;
-			}
-			tmp.text = text;
-			tmp.fontSize = fontSize;
-			tmp.fontStyle = style;
-			tmp.alignment = alignment;
-			tmp.color = new Color32(238, 243, 247, 255);
-			tmp.enableWordWrapping = false;
-			tmp.overflowMode = TextOverflowModes.Ellipsis;
-			return tmp;
-		}
-
-		private static TMP_FontAsset GetOriginalFontAsset(FontStyles style)
-		{
-			SetupOriginalFontAssets();
-			return (style & FontStyles.Bold) != 0 ? _baseFontEB : _baseFontDB;
-		}
-
-		private static void SetupOriginalFontAssets()
-		{
-			if (_fontAssetSetup)
-			{
-				return;
-			}
-
-			_baseFontEB = Resources.Load<TMP_FontAsset>(BaseFontEbPath);
-			_baseFontDB = Resources.Load<TMP_FontAsset>(BaseFontDbPath);
-			TMP_FontAsset dynamicFontEB = Resources.Load<TMP_FontAsset>(DynamicFontEbPath);
-			TMP_FontAsset dynamicFontDB = Resources.Load<TMP_FontAsset>(DynamicFontDbPath);
-			AddFallbackFontAsset(_baseFontEB, dynamicFontEB);
-			AddFallbackFontAsset(_baseFontDB, dynamicFontDB);
-			_fontAssetSetup = true;
-		}
-
-		private static void AddFallbackFontAsset(TMP_FontAsset fontAsset, TMP_FontAsset fallbackFontAsset)
-		{
-			if (fontAsset == null || fallbackFontAsset == null)
-			{
-				return;
-			}
-
-			if (fontAsset.fallbackFontAssetTable == null)
-			{
-				fontAsset.fallbackFontAssetTable = new List<TMP_FontAsset>();
-			}
-
-			if (!fontAsset.fallbackFontAssetTable.Contains(fallbackFontAsset))
-			{
-				fontAsset.fallbackFontAssetTable.Add(fallbackFontAsset);
-			}
-		}
-
 		private static RectTransform CreateRect(string name, Transform parent)
 		{
 			GameObject go = new GameObject(name, typeof(RectTransform));
@@ -2452,7 +2343,7 @@ namespace Sekai.CustomMusicScoreManager
 
 		private static void Stretch(RectTransform rect)
 		{
-			SetAnchor(rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+			UI.SetAnchor(rect, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
 		}
 
 		private static void SetStretchOffsets(RectTransform rect, float left, float bottom, float right, float top)
@@ -2480,31 +2371,6 @@ namespace Sekai.CustomMusicScoreManager
 			rect.pivot = new Vector2(0.5f, 0f);
 			rect.offsetMin = new Vector2(left, bottom);
 			rect.offsetMax = new Vector2(-right, bottom + height);
-		}
-
-		private static void SetAnchor(RectTransform rect, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 anchoredPosition, Vector2 sizeDelta)
-		{
-			rect.anchorMin = anchorMin;
-			rect.anchorMax = anchorMax;
-			rect.pivot = pivot;
-			rect.anchoredPosition = anchoredPosition;
-			rect.sizeDelta = sizeDelta;
-		}
-
-		private sealed class RowView
-		{
-			public GameObject Root { get; }
-
-			public Image Background { get; }
-
-			public CustomMusicScoreManagerItem Item { get; }
-
-			public RowView(GameObject root, Image background, CustomMusicScoreManagerItem item)
-			{
-				Root = root;
-				Background = background;
-				Item = item;
-			}
 		}
 	}
 }
