@@ -57,7 +57,7 @@ namespace Sekai.Live
 				return;
 			}
 
-			if (JudgeInfo.result == NoteResult.None && State <= NoteState.Last && isTouched)
+			if (JudgeInfo.result == NoteResult.None && State <= NoteState.Last)
 			{
 				if (Progress < 1f)
 				{
