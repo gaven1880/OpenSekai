@@ -324,7 +324,6 @@ namespace Sekai
 				onFinished?.Invoke();
 			}
 
-			ResumePausedStartParticle();
 			ScheduleDestroy(5f);
 		}
 

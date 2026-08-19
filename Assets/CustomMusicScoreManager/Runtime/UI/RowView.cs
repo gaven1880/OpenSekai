@@ -8,8 +8,6 @@ namespace Sekai.CustomMusicScoreManager
 {
   public class RowView : MonoBehaviour
 	{
-		public GameObject Root { get; }
-
     [SerializeField]
     private Image background;
 

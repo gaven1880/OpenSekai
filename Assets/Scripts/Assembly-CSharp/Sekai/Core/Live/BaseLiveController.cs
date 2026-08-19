@@ -165,7 +165,11 @@ namespace Sekai.Core.Live
 #endif
 
 			bool keepTransitionUntilMusicStart = ShouldKeepTransitionUntilMusicStart();
-			if (!keepTransitionUntilMusicStart)
+			if (!keepTransitionUntilMusicStart && BootData?.MusicData.IsTestPlay == false) // keep original force transition unless music score maker test play
+			{
+				LiveTransitioner.SafeFinish(null);
+			}
+			else
 			{
 				LiveTransitioner.SafeForceFinish(null);
 			}
