@@ -202,6 +202,23 @@ namespace Sekai
 			LogMissingBundle(bundleName, string.Join(", ", acbFileNames.ToArray()));
 		}
 
+		public void UnloadSoundBundle(string bundleName)
+		{
+    	if (string.IsNullOrEmpty(bundleName))
+    	{
+        return;
+    	}
+
+			if (acbByBundleName.TryGetValue(bundleName, out CriAtomExAcb acb))
+			{
+        acb?.Dispose();
+        acbByBundleName.Remove(bundleName);
+    	}
+
+			loadedBundles.Remove(bundleName);
+			loadedBundleSearchOrder.Remove(bundleName);
+		}
+
 		public void Load(string cueSheetName, string acbFileName)
 		{
 			if (string.IsNullOrEmpty(cueSheetName) || string.IsNullOrEmpty(acbFileName))

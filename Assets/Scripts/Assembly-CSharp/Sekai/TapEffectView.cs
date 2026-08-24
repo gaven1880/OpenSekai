@@ -450,10 +450,49 @@ namespace Sekai
 
 		private void PlayHaptic()
 		{
-			if (!isEnableVibration)
+			if (!isEnableVibration || noteInfo.result == NoteResult.Auto)
 			{
 				return;
 			}
+
+			NoteCategory category = noteInfo.category;
+
+			if ((uint)category > (uint)NoteCategory.FrictionFlick)
+			{
+				return;
+			}
+
+			int mask = 1 << (int)category;
+
+			if ((mask & 0xB4) != 0)
+			{
+				if (noteInfo.type == NoteType.Critical)
+        {
+          CP.NativePlugin.Haptic.Selection();
+          return;
+        }
+        CP.NativePlugin.Haptic.Light();
+        return;
+			}
+
+			if ((mask & 0x43) != 0)
+      {
+        if (noteInfo.type != NoteType.Critical)
+        {
+          CP.NativePlugin.Haptic.Medium();
+          return;
+        }
+        CP.NativePlugin.Haptic.Light();
+        return;
+      }
+
+			if (noteInfo.type == NoteType.Critical)
+      {
+        CP.NativePlugin.Haptic.Medium();
+        return;
+      }
+
+      CP.NativePlugin.Haptic.Heavy();
 		}
 
 		private void PlaySE(string seName, string category, int myNoteId, INote pairNote)

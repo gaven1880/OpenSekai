@@ -50,3 +50,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerCamera: {fileID: 0}
   rowViewPrefab: {fileID: 4134148253744831280, guid: f54ccb7419f88a749a8c897ef776cc41, type: 3}
+  settingsViewPrefab: {fileID: 62701159850052288, guid: 9ef4d25f2fc1833479d226832f2a020e, type: 3}

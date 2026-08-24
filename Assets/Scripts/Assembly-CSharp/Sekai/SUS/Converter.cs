@@ -76,13 +76,12 @@ namespace Sekai.SUS
 			_cachedLiveSettingData = null;
 		}
 
-		public MusicScore Convert(string musicScoreData, bool isNeedCombo = true, bool? overrideMirror = null)
+		public MusicScore Convert(string musicScoreData, bool isNeedCombo = true)
 		{
 			ResetState();
 			musicScore = new MusicScore();
 			liveBundleBuildData = LoadLiveBundleBuildData();
 			_cachedLiveSettingData ??= LiveSettingData.LoadFromStorage();
-			isMirror = overrideMirror ?? (_cachedLiveSettingData?.IsMirror ?? false);
 			isShowPair = _cachedLiveSettingData?.UseSimultaneousPushingLine ?? true;
 
 			Load(musicScoreData ?? string.Empty);
@@ -283,13 +282,6 @@ namespace Sekai.SUS
 					MusicScoreInfo info = MusicScore.GenerateNoteMusicScoreInfo(noteInfo.Bar, noteInfo.BarProgress, musicScore.musicScoreInfoArray);
 					int laneStart = noteInfo.Lane;
 					int laneEnd = noteInfo.Lane + noteInfo.Width - 1;
-					if (isMirror)
-					{
-						int mirroredStart = LaneMaxIndex - laneEnd;
-						int mirroredEnd = LaneMaxIndex - laneStart;
-						laneStart = mirroredStart;
-						laneEnd = mirroredEnd;
-					}
 					NoteCategory category = noteInfo.Category;
 					switch (category)
 					{
