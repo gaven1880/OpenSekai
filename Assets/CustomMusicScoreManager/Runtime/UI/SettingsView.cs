@@ -85,8 +85,8 @@ namespace Sekai.CustomMusicScoreManager
       LocalSettings = ApplicationLocalSettings.LoadFromStorage();
       SettingData = liveSettingData;
 
-      BGMVolumeSelector?.Setup((int)(LocalSettings.SystemVolume.Bgm * 100f), 0, 100, 5);
-      SEVolumeSelector?.Setup((int)(LocalSettings.SystemVolume.Se * 100f), 0, 100, 5);
+      BGMVolumeSelector?.Setup((int)(LocalSettings.LiveVolume.Bgm * 100f), 0, 100, 5);
+      SEVolumeSelector?.Setup((int)(LocalSettings.LiveVolume.Se * 100f), 0, 100, 5);
 
       NoteSpeedSelector?.Setup(SettingData.NoteSpeed, LiveConfig.MinNoteSpeed, LiveConfig.MaxNoteSpeed);
       TimingAdjustSelector?.Setup(SettingData.TimingAdjustData, LiveConfig.MinNoteTiming, LiveConfig.MaxNoteTiming);
