@@ -4,7 +4,7 @@ namespace Sekai.Core.Live
 {
 	public class ScoreLogic
 	{
-		private const int DefaultTotalScore = 1000000;
+		private const int DefaultTotalScore = 1200000;
 
 		private readonly LiveBundleBuildData liveBundleBuildData;
 		private MasterPlayLevelScore scoreInfo;
@@ -143,7 +143,7 @@ namespace Sekai.Core.Live
 				return;
 			}
 
-			// OpenSekai fallback for custom scores: keep rank thresholds aligned with ScoreGaugeCalculator.Create(1000000).
+			// OpenSekai fallback for custom scores: keep rank thresholds aligned with ScoreGaugeCalculator.Create(1200000).
 			int rankS = UnityEngine.Mathf.FloorToInt(ScoreGaugeCalculator.RankRateS * DefaultTotalScore);
 			int rankA = UnityEngine.Mathf.FloorToInt(ScoreGaugeCalculator.RankRateA * DefaultTotalScore);
 			int rankB = UnityEngine.Mathf.FloorToInt(ScoreGaugeCalculator.RankRateB * DefaultTotalScore);

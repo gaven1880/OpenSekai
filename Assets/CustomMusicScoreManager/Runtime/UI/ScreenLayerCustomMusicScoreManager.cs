@@ -789,7 +789,11 @@ namespace Sekai.CustomMusicScoreManager
 				bootData.MusicData.Score = new MasterPlayLevelScore
 				{
 					liveType = LiveType.solo.ToString(),
-					playLevel = entry.Manifest.playLevel
+					playLevel = entry.Manifest.playLevel,
+					s = 1040000,
+					a = 840000,
+					b = 400000,
+					c = 20000
 				};
 				bootData.MusicData.IsTestPlay = false;
 				bootData.MusicData.IsUseCustomScore = true;

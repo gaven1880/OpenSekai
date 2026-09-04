@@ -25,7 +25,7 @@ namespace Sekai.Core.Live
 		{
 			if (score == null || (score.s <= 0 && score.a <= 0 && score.b <= 0 && score.c <= 0))
 			{
-				return Create(1000000);
+				return Create(1200000);
 			}
 			return Create(score.s, score.a, score.b, score.c);
 		}
