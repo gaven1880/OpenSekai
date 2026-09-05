@@ -433,7 +433,11 @@ namespace Sekai.Live
 
 		private Material CreateMovieMaterial()
 		{
-			Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+			Shader shader = Shader.Find("Sekai/Movie/Grid");
+			if (shader == null)
+			{
+				shader = Shader.Find("Universal Render Pipeline/Unlit");
+			}
 			if (shader == null)
 			{
 				shader = Shader.Find("Unlit/Texture");
@@ -514,11 +518,11 @@ namespace Sekai.Live
 			float quadHeight = viewHeight;
 			if (videoAspect > targetAspect)
 			{
-				quadWidth = quadHeight * videoAspect;
+				quadHeight = quadWidth / videoAspect;
 			}
 			else if (videoAspect > 0f)
 			{
-				quadHeight = quadWidth / videoAspect;
+				quadWidth = quadHeight * videoAspect;
 			}
 
 			movieQuadObject.transform.localScale = new Vector3(quadWidth, quadHeight, 1f);
