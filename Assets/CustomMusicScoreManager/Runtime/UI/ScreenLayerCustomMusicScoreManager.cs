@@ -766,6 +766,7 @@ namespace Sekai.CustomMusicScoreManager
 				musicCategory);
 
 			bootData.LiveEventData = new LiveEventData(Array.Empty<IngameLotterySkill>(), Array.Empty<IngameComboCutin>(), deckId, isAuto);
+			bootData.DeckData.TotalPowerIncludeBuff = ApplicationLocalSettings.LoadFromStorage().TotalPower;
 			bootData.LiveSettingData = liveSettingData;
 			bootData.MVQualityType = bootData.LiveSettingData?.QualityType ?? Sekai.MVQualityType.Default;
 			bootData.MusicCategory = musicCategory;
@@ -790,10 +791,10 @@ namespace Sekai.CustomMusicScoreManager
 				{
 					liveType = LiveType.solo.ToString(),
 					playLevel = entry.Manifest.playLevel,
-					s = 1040000,
-					a = 840000,
-					b = 400000,
-					c = 20000
+					s = 1040000 + ((Mathf.Clamp(entry.Manifest.playLevel, 5, 40) - 5) * 5200),
+					a = 840000 + ((Mathf.Clamp(entry.Manifest.playLevel, 5, 40) - 5) * 4200),
+					b = 400000 + ((Mathf.Clamp(entry.Manifest.playLevel, 5, 40) - 5) * 2000),
+					c = 20000 + ((Mathf.Clamp(entry.Manifest.playLevel, 5, 40) - 5) * 100)
 				};
 				bootData.MusicData.IsTestPlay = false;
 				bootData.MusicData.IsUseCustomScore = true;

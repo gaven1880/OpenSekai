@@ -21,6 +21,8 @@ namespace Sekai
 		public VolumeSettings SystemVolume = new VolumeSettings();
 		public VolumeSettings LiveVolume;
 		public bool? FullscreenEnabled;
+		public bool EnableMVLine = true;
+		public int TotalPower = 300000;
 
 		public static ApplicationLocalSettings LoadFromStorage()
 		{

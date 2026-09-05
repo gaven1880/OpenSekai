@@ -9,7 +9,7 @@ namespace Sekai.Core.Live
 		{
 		}
 
-		public int GetScoreValueForm(int type)
+		public float GetScoreValueForm(int type)
 		{
 			return BaseNoteScore;
 		}

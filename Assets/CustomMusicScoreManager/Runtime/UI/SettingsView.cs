@@ -1,4 +1,5 @@
 using Sekai.Live;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -69,6 +70,12 @@ namespace Sekai.CustomMusicScoreManager
     [SerializeField]
     private Radio2OptionSelector DesktopFullscreenSelector;
 
+    [SerializeField]
+    private Radio2OptionSelector MVLineSelector;
+
+    [SerializeField]
+    private TMP_InputField TotalPowerSelector;
+
     private ApplicationLocalSettings LocalSettings;
 
     private LiveSettingData SettingData;
@@ -119,6 +126,8 @@ namespace Sekai.CustomMusicScoreManager
 #else
       DesktopFullscreenSelector?.gameObject.SetActive(false);
 #endif
+      MVLineSelector?.Setup(LocalSettings.EnableMVLine);
+      TotalPowerSelector?.SetTextWithoutNotify(LocalSettings.TotalPower.ToString());
 
       OverlayBackground?.GetComponent<Button>()?.onClick.AddListener(Hide);
       CloseButton?.onClick.AddListener(Hide);
@@ -224,6 +233,14 @@ namespace Sekai.CustomMusicScoreManager
         Screen.fullScreen = DesktopFullscreenSelector.Boolean;
       }
 #endif
+      if (MVLineSelector != null)
+      {
+        LocalSettings.EnableMVLine = MVLineSelector.Boolean;
+      }
+      if (TotalPowerSelector != null)
+      {
+        LocalSettings.TotalPower = int.Parse(TotalPowerSelector.text);
+      }
 
       ApplicationLocalSettings.SaveToStorage(LocalSettings);
       LiveSettingData.SaveToStorage(SettingData);

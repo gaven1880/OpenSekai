@@ -433,7 +433,7 @@ namespace Sekai.Live
 
 		private Material CreateMovieMaterial()
 		{
-			Shader shader = Shader.Find("Sekai/Movie/Grid");
+			Shader shader = Shader.Find(ApplicationLocalSettings.LoadFromStorage().EnableMVLine ? "Sekai/Movie/Grid" : "Universal Render Pipeline/Unlit");
 			if (shader == null)
 			{
 				shader = Shader.Find("Universal Render Pipeline/Unlit");

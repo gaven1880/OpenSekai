@@ -1,17 +1,22 @@
+using System.Linq;
 using Sekai.Live;
+using UnityEngine;
 
 namespace Sekai.Core.Live
 {
 	public class ScoreLogic
 	{
-		private const int DefaultTotalScore = 1200000;
-
 		private readonly LiveBundleBuildData liveBundleBuildData;
+
 		private MasterPlayLevelScore scoreInfo;
+
+		private float dropOutFactor = 0.7f;
+
+		public float totalScoreF;
 
 		public LiveScore score;
 
-		public int BaseNoteScore { get; set; }
+		public float BaseNoteScore { get; set; }
 
 		public bool IsPerfectCombo => score.badCount == 0 && score.missCount == 0 && score.goodCount == 0;
 
@@ -36,11 +41,31 @@ namespace Sekai.Core.Live
 			score.totalComboCount = totalCombo;
 			score.life = liveBundleBuildData != null && liveBundleBuildData.Life > 0 ? liveBundleBuildData.Life : 1000;
 			score.rank = ScoreRank.D;
-			BaseNoteScore = totalCombo > 0 ? UnityEngine.Mathf.Max(1, DefaultTotalScore / totalCombo) : 0;
+			float scoreWeight = musicScore.NoteArray.Sum(note => GetNoteScoreFactor(note));
+			float playLevelFactor = 4 + ((Mathf.Clamp(scoreInfo.playLevel, 5, 40) - 5) * 0.02f);
+			BaseNoteScore = totalCombo > 0 ? bootData.DeckData.TotalPowerIncludeBuff / scoreWeight * playLevelFactor : 0;
 		}
 
 		public virtual void ExcuteEvent(EventBase eventBase)
 		{
+		}
+
+		private float GetNoteScoreFactor(NoteBase note)
+		{
+			bool critical = note.Type == NoteType.Critical;
+
+			return note.Category switch
+			{
+				NoteCategory.Normal => critical ? 2f : 1f,
+				NoteCategory.Long => critical ? 2f : 1f,
+				NoteCategory.Connection => critical ? 0.2f : 0.1f,
+				NoteCategory.Flick => critical ? 3f : 1f,
+				NoteCategory.Friction => critical ? 0.2f : 0.1f,
+				NoteCategory.FrictionLong => critical ? 0.2f : 0.1f,
+				NoteCategory.FrictionFlick => critical ? 3f : 1f,
+				NoteCategory.Combo => 0.1f,
+				_ => 0f,
+			};
 		}
 
 		public virtual void UpdateCombo(NoteBase note)
@@ -106,20 +131,28 @@ namespace Sekai.Core.Live
 				return 0;
 			}
 
-			int addScore = note.Result switch
+			float noteScoreFactor = GetNoteScoreFactor(note);
+			float comboScoreFactor = 1f + (Mathf.FloorToInt(Mathf.Max(0, Mathf.Clamp(score.combo, 0, 1001) - 1) / 100f) * 0.01f);
+			float resultScoreFactor = note.Result switch
 			{
-				NoteResult.JustPerfect => BaseNoteScore,
-				NoteResult.Perfect => UnityEngine.Mathf.RoundToInt(BaseNoteScore * 0.9f),
-				NoteResult.Great => UnityEngine.Mathf.RoundToInt(BaseNoteScore * 0.7f),
-				NoteResult.Good => UnityEngine.Mathf.RoundToInt(BaseNoteScore * 0.5f),
-				NoteResult.Auto => BaseNoteScore,
-				NoteResult.Pass => 0,
-				_ => 0
+				NoteResult.JustPerfect => 1f,
+				NoteResult.Perfect => 1f,
+				NoteResult.Great => 0.7f,
+				NoteResult.Good => 0.5f,
+				NoteResult.Auto => 0.7f,
+				_ => 0f,
 			};
-			int actualAddScore = UnityEngine.Mathf.RoundToInt(addScore * factor);
-			score.totalScore += actualAddScore;
+
+			float addScore = BaseNoteScore * noteScoreFactor * comboScoreFactor * resultScoreFactor;
+			if (score.life == 0)
+			{
+				addScore *= dropOutFactor;
+			}
+			totalScoreF += addScore;
+			score.totalScore = (int)totalScoreF;
 			UpdateScoreRank();
-			return actualAddScore;
+
+			return (int)addScore;
 		}
 
 		public virtual void Damage(NoteBase note)
@@ -131,7 +164,7 @@ namespace Sekai.Core.Live
 
 			if (LiveConfig.Damages.TryGetValue(note.Result, out int damage))
 			{
-				score.life = UnityEngine.Mathf.Max(0, score.life - damage);
+				score.life = Mathf.Max(0, score.life - damage);
 			}
 		}
 
@@ -142,17 +175,6 @@ namespace Sekai.Core.Live
 				score.rank = ScoreGaugeCalculator.GetScoreRank(scoreInfo, score.totalScore);
 				return;
 			}
-
-			// OpenSekai fallback for custom scores: keep rank thresholds aligned with ScoreGaugeCalculator.Create(1200000).
-			int rankS = UnityEngine.Mathf.FloorToInt(ScoreGaugeCalculator.RankRateS * DefaultTotalScore);
-			int rankA = UnityEngine.Mathf.FloorToInt(ScoreGaugeCalculator.RankRateA * DefaultTotalScore);
-			int rankB = UnityEngine.Mathf.FloorToInt(ScoreGaugeCalculator.RankRateB * DefaultTotalScore);
-			int rankC = UnityEngine.Mathf.FloorToInt(ScoreGaugeCalculator.RankRateC * DefaultTotalScore);
-			score.rank = score.totalScore >= rankS ? ScoreRank.S
-				: score.totalScore >= rankA ? ScoreRank.A
-				: score.totalScore >= rankB ? ScoreRank.B
-				: score.totalScore >= rankC ? ScoreRank.C
-				: ScoreRank.D;
 		}
 	}
 }
