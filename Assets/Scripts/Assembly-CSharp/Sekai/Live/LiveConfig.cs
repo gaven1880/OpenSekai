@@ -184,16 +184,14 @@ namespace Sekai.Live
 			AddJudgeFrame(JudgeFrameType.Long_Critical, 3.3f, 3.3f, 4.5f, 4.5f, 6.5f, 6.5f, 7.5f, 7.5f);
 			AddJudgeFrame(JudgeFrameType.Long_End_Critical, 3.5f, 4f, 6.5f, 8f, 7.5f, 8.5f, 7.5f, 8.5f);
 			AddJudgeFrame(JudgeFrameType.Long_End_Flick_Critical, 3.5f, 4f, 6.5f, 8f, 7.5f, 8.5f, 7.5f, 8.5f);
-
-			// TODO(original): confirm the friction-specific judge frames once the matching master data is imported.
-			CopyJudgeFrame(JudgeFrameType.Friction, JudgeFrameType.Flick);
-			CopyJudgeFrame(JudgeFrameType.Friction_Critical, JudgeFrameType.Flick_Critical);
-			CopyJudgeFrame(JudgeFrameType.Friction_Flick, JudgeFrameType.Flick);
-			CopyJudgeFrame(JudgeFrameType.Friction_Flick_Critical, JudgeFrameType.Flick_Critical);
-			CopyJudgeFrame(JudgeFrameType.Friction_Long, JudgeFrameType.Long);
-			CopyJudgeFrame(JudgeFrameType.Friction_Long_Critical, JudgeFrameType.Long_Critical);
-			CopyJudgeFrame(JudgeFrameType.Friction_Long_End, JudgeFrameType.Long_End);
-			CopyJudgeFrame(JudgeFrameType.Friction_Long_End_Critical, JudgeFrameType.Long_End_Critical);
+      AddJudgeFrame(JudgeFrameType.Friction, 5f, 5f, 5f, 5f, 5f, 5f, 5f, 5f);
+			AddJudgeFrame(JudgeFrameType.Friction_Critical, 5f, 5f, 5f, 5f, 5f, 5f, 5f, 5f);
+			AddJudgeFrame(JudgeFrameType.Friction_Long, 5f, 5f, 5f, 5f, 5f, 5f, 5f, 5f);
+			AddJudgeFrame(JudgeFrameType.Friction_Long_Critical, 5f, 5f, 5f, 5f, 5f, 5f, 5f, 5f);
+			AddJudgeFrame(JudgeFrameType.Friction_Long_End, 6.5f, 8f, 6.5f, 8f, 6.5f, 8f, 6.5f, 8f);
+			AddJudgeFrame(JudgeFrameType.Friction_Long_End_Critical, 6.5f, 8f, 6.5f, 8f, 6.5f, 8f, 6.5f, 8f);
+			AddJudgeFrame(JudgeFrameType.Friction_Flick, 6.5f, 7.5f, 6.5f, 7.5f, 6.5f, 7.5f, 6.5f, 7.5f);
+			AddJudgeFrame(JudgeFrameType.Friction_Flick_Critical, 6.5f, 7.5f, 6.5f, 7.5f, 6.5f, 7.5f, 6.5f, 7.5f);
 		}
 
 		private static void AddJudgeFrame(JudgeFrameType noteType, float perfectBefore, float perfectAfter, float greatBefore, float greatAfter, float goodBefore, float goodAfter, float badBefore, float badAfter)
@@ -208,24 +206,6 @@ namespace Sekai.Live
 				CalcFrameToTime(goodAfter),
 				CalcFrameToTime(badBefore),
 				CalcFrameToTime(badAfter));
-
-			noteTypeJudgeData.JudgeTimes[noteType] = judgeTimeData;
-			UpdateJudgeTimeBeforeAndAfter(judgeTimeData);
-		}
-
-		private static void CopyJudgeFrame(JudgeFrameType noteType, JudgeFrameType source)
-		{
-			var sourceData = noteTypeJudgeData.JudgeTimes[source];
-			var judgeTimeData = new JudgeTimeData(
-				noteType,
-				sourceData.PerfectBeforeJudgeTime,
-				sourceData.PerfectAfterJudgeTime,
-				sourceData.GreatBeforeJudgeTime,
-				sourceData.GreatAfterJudgeTime,
-				sourceData.GoodBeforeJudgeTime,
-				sourceData.GoodAfterJudgeTime,
-				sourceData.BadBeforeJudgeTime,
-				sourceData.BadAfterJudgeTime);
 
 			noteTypeJudgeData.JudgeTimes[noteType] = judgeTimeData;
 			UpdateJudgeTimeBeforeAndAfter(judgeTimeData);
