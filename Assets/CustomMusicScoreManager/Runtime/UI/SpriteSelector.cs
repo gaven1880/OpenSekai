@@ -30,7 +30,7 @@ namespace Sekai.CustomMusicScoreManager
         return;
       }
 
-      Index = index;
+      ChangeIndex(index);
       UpdateSprite();
       MinButton?.onClick.AddListener(() => ChangeIndex(Index - 1));
       AddButton?.onClick.AddListener(() => ChangeIndex(Index + 1));
