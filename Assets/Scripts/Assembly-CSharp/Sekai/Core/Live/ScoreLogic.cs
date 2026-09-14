@@ -33,24 +33,25 @@ namespace Sekai.Core.Live
 		{
 			score = default;
 			scoreInfo = bootData?.MusicData?.Score;
+			float playLevelFactor = (bootData.MusicData.Difficulty.playLevel - 5) * 0.005f + 1.0f;
+			score.baseTotalScore = Mathf.FloorToInt(playLevelFactor * (4 * bootData.DeckData.TotalPowerIncludeBuff));
+			BaseNoteScore = score.baseTotalScore / musicScore.NoteArray.SelectMany(note => note.NoteList).Sum(note => GetNoteScoreFactor(note));
 			int totalCombo = LiveUtility.CalculateTotalComboCount(musicScore);
 			if (totalCombo <= 0)
 			{
 				totalCombo = bootData?.MusicData?.TotalNoteCount ?? 0;
 			}
 			score.totalComboCount = totalCombo;
+			totalScoreF = 0f;
 			score.life = liveBundleBuildData != null && liveBundleBuildData.Life > 0 ? liveBundleBuildData.Life : 1000;
 			score.rank = ScoreRank.D;
-			float scoreWeight = musicScore.NoteArray.Sum(note => GetNoteScoreFactor(note));
-			float playLevelFactor = 4 + ((Mathf.Clamp(scoreInfo.playLevel, 5, 40) - 5) * 0.02f);
-			BaseNoteScore = totalCombo > 0 ? bootData.DeckData.TotalPowerIncludeBuff / scoreWeight * playLevelFactor : 0;
 		}
 
 		public virtual void ExcuteEvent(EventBase eventBase)
 		{
 		}
 
-		private float GetNoteScoreFactor(NoteBase note)
+		private float GetNoteScoreFactor(INote note)
 		{
 			bool critical = note.Type == NoteType.Critical;
 
