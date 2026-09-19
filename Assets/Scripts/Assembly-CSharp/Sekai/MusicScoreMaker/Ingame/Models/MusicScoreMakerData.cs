@@ -113,7 +113,8 @@ namespace Sekai.MusicScoreMaker.Ingame.Models
 			NoteCategory.GuideHidden,
 			NoteCategory.FrictionHideLong,
 			NoteCategory.FrictionHide,
-			NoteCategory.Hidden
+			NoteCategory.Hidden,
+			NoteCategory.Combo,
 		};
 
 		private static readonly IComparer<MusicScoreNoteBase> NoteTicksComparer = Comparer<MusicScoreNoteBase>.Create(CompareNoteByTicks);

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using MessagePack;
 using Newtonsoft.Json;
 using Sekai.Live;
@@ -138,17 +138,22 @@ namespace Sekai.MusicScoreMaker.Ingame.Models
 			{
 				return Array.Empty<MusicScoreNoteBase>();
 			}
-			MusicScoreNoteBase firstNote = FromNoteBase(noteBase, getNewId, sortedMusicScoreInfos);
-			if (noteBase.NoteList == null || noteBase.NoteList.Count < 2)
+			List<NoteBase> chainNotes = noteBase.NoteList == null
+					? new List<NoteBase> { noteBase }
+					: noteBase.NoteList.Where(n => n != null && !(n is LongHoldCombo)).ToList();
+
+			MusicScoreNoteBase firstNote = FromNoteBase(chainNotes[0], getNewId, sortedMusicScoreInfos);
+			if (chainNotes.Count < 2)
 			{
 				return new[] { firstNote };
 			}
-			MusicScoreNoteBase[] result = new MusicScoreNoteBase[noteBase.NoteList.Count];
+
+			MusicScoreNoteBase[] result = new MusicScoreNoteBase[chainNotes.Count];
 			result[0] = firstNote;
 			MusicScoreNoteBase previousNote = firstNote;
-			for (int i = 1; i < noteBase.NoteList.Count; i++)
+			for (int i = 1; i < chainNotes.Count; i++)
 			{
-				MusicScoreNoteBase currentNote = FromNoteBase(noteBase.NoteList[i], getNewId, sortedMusicScoreInfos);
+				MusicScoreNoteBase currentNote = FromNoteBase(chainNotes[i], getNewId, sortedMusicScoreInfos);
 				previousNote.nextConnectionId = currentNote.id;
 				currentNote.previousConnectionId = previousNote.id;
 				result[i] = currentNote;
@@ -249,65 +254,65 @@ namespace Sekai.MusicScoreMaker.Ingame.Models
 			NoteBase note;
 			switch (noteBase.noteBaseType)
 			{
-			case NoteBaseType.Normal:
-				note = new NormalNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.speedRatio, noteBase.type, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData));
-				break;
-			case NoteBaseType.Long:
-				note = new LongNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, noteBase.speedRatio, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData), noteBase.noteLineType);
-				break;
-			case NoteBaseType.Flick:
-				note = new FlickNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.speedRatio, noteBase.type, noteBase.direction, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData), bundleBuildData == null ? 0f : bundleBuildData.FlickDistance);
-				break;
-			case NoteBaseType.FrictionFlick:
-				note = new FrictionFlickNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.speedRatio, noteBase.type, noteBase.direction, LiveUtility.ScreenDpiToInch(bundleBuildData == null ? 0f : bundleBuildData.FlickDistance), LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData));
-				break;
-			case NoteBaseType.Connection:
-				note = new ConnectionNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, noteBase.speedRatio, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData), noteBase.noteLineType);
-				note.SetSkip(noteBase.isSkip);
-				longNote?.AddConnectionNote(note);
-				return note;
-			case NoteBaseType.HiddenConnection:
-				note = new HiddenConnectionNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, noteBase.speedRatio, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData), noteBase.noteLineType);
-				note.SetSkip(noteBase.isSkip);
-				longNote?.AddConnectionNote(note);
-				return note;
-			case NoteBaseType.LongHoldCombo:
-				note = new LongHoldCombo(musicScoreInfo, noteBase.type, noteBase.speedRatio, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData));
-				note.SetSkip(noteBase.isSkip);
-				longNote?.AddHoldCombo((LongHoldCombo)note);
-				return note;
-			case NoteBaseType.FrictionLong:
-				note = new FrictionLongNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, bundleBuildData, noteBase.speedRatio, noteBase.noteLineType);
-				break;
-			case NoteBaseType.FrictionHideLong:
-				note = new FrictionHideLongNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, bundleBuildData, noteBase.speedRatio, noteBase.noteLineType);
-				break;
-			case NoteBaseType.Guide:
-				if (noteBase.previousConnectionId != -1 && noteBase.nextConnectionId == -1)
-				{
+				case NoteBaseType.Normal:
+					note = new NormalNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.speedRatio, noteBase.type, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData));
+					break;
+				case NoteBaseType.Long:
+					note = new LongNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, noteBase.speedRatio, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData), noteBase.noteLineType);
+					break;
+				case NoteBaseType.Flick:
+					note = new FlickNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.speedRatio, noteBase.type, noteBase.direction, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData), bundleBuildData == null ? 0f : bundleBuildData.FlickDistance);
+					break;
+				case NoteBaseType.FrictionFlick:
+					note = new FrictionFlickNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.speedRatio, noteBase.type, noteBase.direction, LiveUtility.ScreenDpiToInch(bundleBuildData == null ? 0f : bundleBuildData.FlickDistance), LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData));
+					break;
+				case NoteBaseType.Connection:
+					note = new ConnectionNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, noteBase.speedRatio, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData), noteBase.noteLineType);
+					note.SetSkip(noteBase.isSkip);
+					longNote?.AddConnectionNote(note);
+					return note;
+				case NoteBaseType.HiddenConnection:
+					note = new HiddenConnectionNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, noteBase.speedRatio, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData), noteBase.noteLineType);
+					note.SetSkip(noteBase.isSkip);
+					longNote?.AddConnectionNote(note);
+					return note;
+				case NoteBaseType.LongHoldCombo:
+					note = new LongHoldCombo(musicScoreInfo, noteBase.type, noteBase.speedRatio, LiveUtility.GetLaneOffset(noteBase.category, bundleBuildData));
+					note.SetSkip(noteBase.isSkip);
+					longNote?.AddHoldCombo((LongHoldCombo)note);
+					return note;
+				case NoteBaseType.FrictionLong:
+					note = new FrictionLongNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, bundleBuildData, noteBase.speedRatio, noteBase.noteLineType);
+					break;
+				case NoteBaseType.FrictionHideLong:
+					note = new FrictionHideLongNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, bundleBuildData, noteBase.speedRatio, noteBase.noteLineType);
+					break;
+				case NoteBaseType.Guide:
+					if (noteBase.previousConnectionId != -1 && noteBase.nextConnectionId == -1)
+					{
+						note = new GuideEndNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, bundleBuildData, noteBase.type, noteBase.speedRatio, noteBase.noteLineType);
+					}
+					else
+					{
+						note = new GuideNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, bundleBuildData, noteBase.speedRatio, noteBase.noteLineType);
+					}
+					break;
+				case NoteBaseType.Friction:
+					note = new FrictionNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, bundleBuildData, noteBase.type, noteBase.speedRatio, noteBase.noteLineType);
+					break;
+				case NoteBaseType.FrictionHide:
+					note = new FrictionHideNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, bundleBuildData, noteBase.type, noteBase.speedRatio, noteBase.noteLineType);
+					break;
+				case NoteBaseType.GuideEnd:
 					note = new GuideEndNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, bundleBuildData, noteBase.type, noteBase.speedRatio, noteBase.noteLineType);
-				}
-				else
-				{
-					note = new GuideNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, noteBase.type, bundleBuildData, noteBase.speedRatio, noteBase.noteLineType);
-				}
-				break;
-			case NoteBaseType.Friction:
-				note = new FrictionNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, bundleBuildData, noteBase.type, noteBase.speedRatio, noteBase.noteLineType);
-				break;
-			case NoteBaseType.FrictionHide:
-				note = new FrictionHideNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, bundleBuildData, noteBase.type, noteBase.speedRatio, noteBase.noteLineType);
-				break;
-			case NoteBaseType.GuideEnd:
-				note = new GuideEndNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, bundleBuildData, noteBase.type, noteBase.speedRatio, noteBase.noteLineType);
-				break;
-			case NoteBaseType.GuideHiddenConnection:
-				note = new GuideHiddenConnectionNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, bundleBuildData, noteBase.type, noteBase.speedRatio, noteBase.noteLineType);
-				note.SetSkip(noteBase.isSkip);
-				longNote?.AddConnectionNote(note);
-				return note;
-			default:
-				throw new ArgumentOutOfRangeException(nameof(noteBase.noteBaseType), noteBase.noteBaseType, null);
+					break;
+				case NoteBaseType.GuideHiddenConnection:
+					note = new GuideHiddenConnectionNote(musicScoreInfo, 0, noteBase.laneStart, noteBase.laneEnd, noteBase.category, bundleBuildData, noteBase.type, noteBase.speedRatio, noteBase.noteLineType);
+					note.SetSkip(noteBase.isSkip);
+					longNote?.AddConnectionNote(note);
+					return note;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(noteBase.noteBaseType), noteBase.noteBaseType, null);
 			}
 			note.SetSkip(noteBase.isSkip);
 			SetParent(longNote, note);
@@ -341,21 +346,21 @@ namespace Sekai.MusicScoreMaker.Ingame.Models
 			int endLane;
 			switch (selectedTargetOperation.noteTapPosition)
 			{
-			case SelectedTargetOperation.NoteTapPosition.none:
-			case SelectedTargetOperation.NoteTapPosition.center:
-				startLane = MusicScoreMakerUtility.ClampLaneStart(laneStart + deltaLane);
-				endLane = MusicScoreMakerUtility.ClampLaneEnd(laneEnd + deltaLane);
-				break;
-			case SelectedTargetOperation.NoteTapPosition.left:
-				startLane = MusicScoreMakerUtility.ClampLaneStart(laneStart + deltaLane, laneEnd);
-				endLane = laneEnd;
-				break;
-			case SelectedTargetOperation.NoteTapPosition.right:
-				startLane = laneStart;
-				endLane = MusicScoreMakerUtility.ClampLaneEnd(laneEnd + deltaLane, laneStart);
-				break;
-			default:
-				throw new ArgumentOutOfRangeException();
+				case SelectedTargetOperation.NoteTapPosition.none:
+				case SelectedTargetOperation.NoteTapPosition.center:
+					startLane = MusicScoreMakerUtility.ClampLaneStart(laneStart + deltaLane);
+					endLane = MusicScoreMakerUtility.ClampLaneEnd(laneEnd + deltaLane);
+					break;
+				case SelectedTargetOperation.NoteTapPosition.left:
+					startLane = MusicScoreMakerUtility.ClampLaneStart(laneStart + deltaLane, laneEnd);
+					endLane = laneEnd;
+					break;
+				case SelectedTargetOperation.NoteTapPosition.right:
+					startLane = laneStart;
+					endLane = MusicScoreMakerUtility.ClampLaneEnd(laneEnd + deltaLane, laneStart);
+					break;
+				default:
+					throw new ArgumentOutOfRangeException();
 			}
 			return new NoteOperation(id, startLane, endLane, ticks);
 		}
