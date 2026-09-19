@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Sekai.Live;
 using Sekai.MusicScoreMaker.Common;
@@ -654,7 +655,7 @@ namespace Sekai.CustomMusicScoreManager
 				difficulty = entry.Manifest.musicDifficultyType,
 				vocalId = 0,
 				baseMusicDifficultyId = -1,
-				MusicScoreMakerData = entry.LoadScore(),
+				MusicScoreMakerData = new MusicScoreMakerData(entry.LoadScore()),
 				LastSavedDataHash = null,
 				CurrentMusicScoreScale = 1f,
 				FromScreenType = MenuScreenType.MusicScoreMakerTop,
@@ -701,13 +702,13 @@ namespace Sekai.CustomMusicScoreManager
 				return;
 			}
 
-			MusicScoreMakerData scoreData = entry.LoadScore();
-			if (scoreData == null)
+			MusicScore score = entry.LoadScore();
+			if (score == null)
 			{
 				SetStatus("无法加载谱面文件。");
 				return;
 			}
-			if (!HasPlayableNotes(scoreData))
+			if (!HasPlayableNotes(score))
 			{
 				SetStatus("没有可游玩的音符。");
 				return;
@@ -721,7 +722,7 @@ namespace Sekai.CustomMusicScoreManager
 				return;
 			}
 
-			FreeLiveBootData bootData = CreateDirectPlayBootData(entry, scoreData, isAuto);
+			FreeLiveBootData bootData = CreateDirectPlayBootData(entry, score, isAuto);
 			if (bootData == null)
 			{
 				SetStatus("无法创建游玩启动数据。");
@@ -735,23 +736,21 @@ namespace Sekai.CustomMusicScoreManager
 			SetStatus(isAuto ? "正在开始自动游玩..." : "正在开始游玩...");
 		}
 
-		private static bool HasPlayableNotes(MusicScoreMakerData data)
+		private static bool HasPlayableNotes(MusicScore score)
 		{
-			return data?.NoteList != null && data.NoteList.Exists(note => note != null);
+			return score?.NoteArray != null && score.NoteArray.ToList().Exists(note => note != null);
 		}
 
-		private FreeLiveBootData CreateDirectPlayBootData(CustomMusicScoreEntry entry, MusicScoreMakerData scoreData, bool isAuto)
+		private FreeLiveBootData CreateDirectPlayBootData(CustomMusicScoreEntry entry, MusicScore score, bool isAuto)
 		{
-			if (entry == null || scoreData == null)
+			if (entry == null || score == null)
 			{
 				return null;
 			}
 
 			LiveSettingData liveSettingData = LiveSettingData.LoadFromStorage();
-			LiveBundleBuildData liveBundleBuildData = Resources.Load<LiveBundleBuildData>(LiveConfig.ConfigBundleNamePath);
-			MusicScore musicScore = scoreData.ToMusicScore(liveBundleBuildData, null, liveSettingData.IsMirror);
 			int deckId = UserDataManager.Instance.SelectedDeckId;
-			MasterMusicDifficulty difficulty = CreateDirectPlayDifficulty(entry, musicScore);
+			MasterMusicDifficulty difficulty = CreateDirectPlayDifficulty(entry, score);
 			string difficultyString = difficulty?.musicDifficulty ?? "master";
 			MusicCategory musicCategory = ResolveDirectPlayMusicCategory(liveSettingData);
 
@@ -799,7 +798,7 @@ namespace Sekai.CustomMusicScoreManager
 				bootData.MusicData.IsTestPlay = false;
 				bootData.MusicData.IsUseCustomScore = true;
 				bootData.MusicData.CustomPlayLevel = entry.Manifest.playLevel;
-				bootData.MusicData.MusicScore = musicScore;
+				bootData.MusicData.MusicScore = score;
 				bootData.MusicData.StartMusicTimeMs = 0L;
 				bootData.MusicData.PlayStartEffectEnabled = true;
 			}

@@ -3,8 +3,11 @@ using System.IO;
 using System.Threading;
 using CP;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
+using Sekai.Live;
 using Sekai.MusicScoreMaker.Ingame.Models;
 using Sekai.MusicScoreMaker.Ingame.Utilities;
+using Sekai.SUS;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -58,22 +61,42 @@ namespace Sekai.MusicScoreMaker.Common
 			}
 		}
 
-		public MusicScoreMakerData LoadScore()
+		public MusicScore LoadScore()
 		{
 			if (!File.Exists(ScorePath))
 			{
 				return null;
 			}
 
-			MusicScoreMakerData data = DeepCopyHelper.FromJson<MusicScoreMakerData>(File.ReadAllText(ScorePath));
-			if (data == null)
+			LiveBundleBuildData liveBundleBuildData = Resources.Load<LiveBundleBuildData>(LiveConfig.ConfigBundleNamePath);
+			LiveSettingData liveSettingData = LiveSettingData.LoadFromStorage();
+
+			string text = File.ReadAllText(ScorePath);
+			MusicScoreMakerData data;
+
+			try
 			{
-				return null;
+				data = DeepCopyHelper.FromJson<MusicScoreMakerData>(text);
 			}
-			data.MigrateToCurrentVersion();
-			data.InitializeIdCount();
-			data.MusicId = MusicId;
-			return data;
+			catch (JsonReaderException)
+			{
+				data = null;
+			}
+
+			MusicScore score = data?.ToMusicScore(liveBundleBuildData, null, liveSettingData.IsMirror);
+
+			if (score == null)
+			{
+				Converter converter = new Converter();
+				score = converter.Convert(text, false);
+
+				if (score == null)
+				{
+					return null;
+				}
+			}
+
+			return score;
 		}
 
 		public void SaveScore(MusicScoreMakerData data)

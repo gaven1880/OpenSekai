@@ -262,7 +262,7 @@ namespace Sekai.CustomMusicScoreManager
 
 			Directory.CreateDirectory(entry.RootDirectory);
 			CustomMusicScoreManifest manifest = CloneManifest(entry.Manifest);
-			string destinationPath = Path.Combine(entry.RootDirectory, "score.json");
+			string destinationPath = Path.Combine(entry.RootDirectory, "score" + extension);
 			string tempCopyPath = null;
 			string readSourcePath = sourcePath;
 			if (IsPathInsideDirectory(entry.RootDirectory, sourcePath))
@@ -275,23 +275,10 @@ namespace Sekai.CustomMusicScoreManager
 			try
 			{
 				DeleteExistingScoreFiles(entry.RootDirectory, manifest.scoreFileName);
-				if (extension.Equals(".json", StringComparison.OrdinalIgnoreCase))
-				{
-					File.Copy(readSourcePath, destinationPath, true);
-				}
-				else
-				{
-					string susText = File.ReadAllText(readSourcePath);
-					Converter converter = new Converter();
-					// Original editor import calls SUS.Converter.Convert with isNeedCombo=false.
-					// LongHoldCombo notes are generated later when MusicScoreMakerData is converted for live play.
-					MusicScoreMakerData data = new MusicScoreMakerData(converter.Convert(susText, false));
-					data.MusicId = entry.MusicId;
-					data.InitializeIdCount();
-					File.WriteAllText(destinationPath, DeepCopyHelper.ToJsonString(data));
-				}
+				
+				File.Copy(readSourcePath, destinationPath, true);
 
-				manifest.scoreFileName = "score.json";
+				manifest.scoreFileName = "score" + extension;
 				manifest.Normalize();
 				WriteManifest(entry.RootDirectory, manifest);
 				return CustomMusicScoreStorage.LoadEntry(entry.RootDirectory);

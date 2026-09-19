@@ -2851,7 +2851,7 @@ namespace Sekai.MusicScoreMaker.Ingame.Presenters
 			_model.AssetbundleName = entry.AudioCueName;
 			_model.LastSelectFile = manifest.scoreFileName;
 
-			MusicScoreMakerData data = musicScore ?? entry.LoadScore();
+			MusicScoreMakerData data = musicScore ?? new MusicScoreMakerData(entry.LoadScore());
 			if (data == null)
 			{
 				data = LoadMusicScoreMakerData(entry.MusicId, manifest.musicDifficultyType, clearNotes: true);
