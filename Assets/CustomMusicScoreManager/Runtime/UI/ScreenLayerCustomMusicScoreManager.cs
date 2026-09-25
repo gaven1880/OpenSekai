@@ -1734,6 +1734,7 @@ namespace Sekai.CustomMusicScoreManager
 			scrollRect.horizontal = false;
 			scrollRect.vertical = true;
 			scrollRect.movementType = ScrollRect.MovementType.Clamped;
+			scrollRect.scrollSensitivity = 0.1f;
 			return scrollRect;
 		}
 
