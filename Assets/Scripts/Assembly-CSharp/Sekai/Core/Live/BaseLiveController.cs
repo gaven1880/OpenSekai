@@ -335,6 +335,18 @@ namespace Sekai.Core.Live
 			}
 		}
 
+		protected override void OnSystemPause()
+		{
+			base.OnSystemPause();
+
+			if (!IsPause || IsExit)
+			{
+				return;
+			}
+
+			OnPause();
+		}
+
 		protected virtual void OnPause()
 		{
 		}

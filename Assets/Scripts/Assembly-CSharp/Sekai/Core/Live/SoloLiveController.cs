@@ -79,6 +79,7 @@ namespace Sekai.Core.Live
 		{
 			if ((state == LiveControllerState.Playing || state == LiveControllerState.ResumeCountDown) && result == 0)
 			{
+				StopResumeCoroutine();
 				state = LiveControllerState.Pause;
 				SoundManager.Instance.PauseIngame(currentMusicTimeMs);
 				LiveViewExt.Pause(liveViews);
@@ -112,6 +113,7 @@ namespace Sekai.Core.Live
 				return;
 			}
 
+			StopResumeCoroutine();
 			state = LiveControllerState.Pause;
 			SoundManager.Instance.PauseIngame(currentMusicTimeMs);
 			LiveViewExt.Pause(liveViews);
@@ -127,10 +129,7 @@ namespace Sekai.Core.Live
 			state = LiveControllerState.ResumeCountDown;
 			liveOutUIController?.Destroy();
 			LiveViewExt.Countdown(liveViews);
-			if (resumeCoroutine != null)
-			{
-				StopCoroutine(resumeCoroutine);
-			}
+			StopResumeCoroutine();
 			resumeCoroutine = StartCoroutine(ResumeCoroutine());
 		}
 
@@ -158,6 +157,7 @@ namespace Sekai.Core.Live
 		{
 			liveOutUIController?.Destroy();
 			SoundManager.Instance.StopIngame();
+			StopResumeCoroutine();
 			isTestPlayFinishedCalled = false;
 			playHistoryRecorded = false;
 			result = 0;
@@ -231,6 +231,17 @@ namespace Sekai.Core.Live
 			state = LiveControllerState.Playing;
 			LiveViewExt.Resume(liveViews, currentAudioLatencyMusicTimeMs);
 			SoundManager.Instance.SetAudioSyncedUnityTimer(cueId);
+			resumeCoroutine = null;
+		}
+
+		private void StopResumeCoroutine()
+		{
+			if (resumeCoroutine == null)
+			{
+				return;
+			}
+
+			StopCoroutine(resumeCoroutine);
 			resumeCoroutine = null;
 		}
 
@@ -358,6 +369,7 @@ namespace Sekai.Core.Live
 			{
 				StopCoroutine(finishCoroutine);
 			}
+			StopResumeCoroutine();
 			if (liveLogic != null)
 			{
 				liveLogic.OnFinished -= OnFinished;

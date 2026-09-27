@@ -49,6 +49,8 @@ namespace Sekai.Live
 		private MeshRenderer movieQuadRenderer;
 		private Material movieMaterial;
 		private bool movieModeActive;
+		private bool moviePaused;
+		private float pausedMovieTime;
 		private bool pendingMoviePlay;
 		private float pendingMovieStartTime;
 		private string moviePlaybackPath;
@@ -164,10 +166,17 @@ namespace Sekai.Live
 
 		public override void Pause()
 		{
-			if (movieModeActive && videoPlayer != null && videoPlayer.isPlaying)
+			if (!movieModeActive || videoPlayer == null)
 			{
-				videoPlayer.Pause();
+				return;
 			}
+
+			moviePaused = true;
+			if (videoPlayer.isPrepared)
+			{
+				pausedMovieTime = (float)videoPlayer.time;
+			}
+			videoPlayer.Pause();
 		}
 
 		public override void Resume(float musicTime)
@@ -177,10 +186,22 @@ namespace Sekai.Live
 				return;
 			}
 
-			if (videoPlayer == null || !videoPlayer.isPrepared)
+			moviePaused = false;
+			if (videoPlayer == null)
 			{
 				PlayMovieAt(GetInitialMovieStartTime());
 				return;
+			}
+
+			if (!videoPlayer.isPrepared || pendingMoviePlay)
+			{
+				PlayMovieAt(pendingMoviePlay ? pendingMovieStartTime : GetInitialMovieStartTime());
+				return;
+			}
+
+			if (videoPlayer.canSetTime)
+			{
+				videoPlayer.time = pausedMovieTime;
 			}
 
 			videoPlayer.Play();
@@ -193,6 +214,7 @@ namespace Sekai.Live
 				return;
 			}
 
+			moviePaused = false;
 			pendingMoviePlay = false;
 			pendingMovieStartTime = 0f;
 			if (videoPlayer != null)
@@ -270,6 +292,7 @@ namespace Sekai.Live
 			}
 
 			movieModeActive = true;
+			moviePaused = false;
 			pendingMoviePlay = false;
 			pendingMovieStartTime = 0f;
 			SetJacketsActive(false);
@@ -556,6 +579,11 @@ namespace Sekai.Live
 				return;
 			}
 
+			if (moviePaused)
+			{
+				return;
+			}
+
 			pendingMoviePlay = false;
 			if (videoPlayer.canSetTime && pendingMovieStartTime > 0.05f)
 			{
@@ -670,6 +698,7 @@ namespace Sekai.Live
 		{
 			pendingMoviePlay = false;
 			pendingMovieStartTime = 0f;
+			moviePaused = false;
 			if (videoPlayer != null)
 			{
 				videoPlayer.Stop();
