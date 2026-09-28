@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.CompilerServices;
 using JetBrains.Annotations;
 using Sekai.ApiData;
+using Sekai.CustomMusicScoreManager;
 using Sekai.Live;
 using Sekai.MusicScoreMaker.Common;
 using Sekai.MusicScoreMaker.Ingame.Events;
@@ -7422,9 +7423,18 @@ namespace Sekai.MusicScoreMaker.Ingame.Presenters
 			}
 
 			CustomMusicScoreStorage.SaveScore(entry, data);
-			_model.LastSelectFile = entry.Manifest.scoreFileName;
+
+			// so uhh the path mightve changed so do stuff yeah
+			CustomMusicScoreEntry savedEntry = CustomMusicScoreManagerService.SaveManifest(entry, entry.Manifest);
+			if (savedEntry == null)
+			{
+				return false;
+			}
+
+			_model.CustomMusicScoreEntry = savedEntry;
+			_model.LastSelectFile = savedEntry.Manifest.scoreFileName;
 			_model.UpdateSavedDataHash();
-			UnityEngine.Debug.Log($"Custom music score saved: {entry.ScorePath}");
+			UnityEngine.Debug.Log($"Custom music score saved: {savedEntry.ScorePath}");
 			return true;
 		}
 

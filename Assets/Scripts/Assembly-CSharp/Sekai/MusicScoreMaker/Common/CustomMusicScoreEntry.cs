@@ -108,6 +108,11 @@ namespace Sekai.MusicScoreMaker.Common
 
 			Directory.CreateDirectory(RootDirectory);
 			data.MusicId = MusicId;
+
+			// some scores can be stored as sus, but saving through music score maker causes it to be MusicScoreMakerData
+			// switch format to JSON
+			// this only renames the file in memory. caller must persist the manifest so the new file name stays after reload
+			Manifest.scoreFileName = Path.GetFileNameWithoutExtension(Manifest.scoreFileName) + ".json";
 			File.WriteAllText(ScorePath, DeepCopyHelper.ToJsonString(data));
 		}
 
