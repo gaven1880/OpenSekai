@@ -7042,11 +7042,19 @@ namespace Sekai.MusicScoreMaker.Ingame.Presenters
 				bootData.MusicData.Music = masterMusicAll?.music ?? CreateTestPlayMusic(musicId, cueName);
 				bootData.MusicData.Difficulty = difficulty;
 				bootData.MusicData.Vocal = FindMasterMusicVocal(masterMusicAll, vocalId) ?? CreateTestPlayVocal(musicId, vocalId, cueName, _model?.CustomMusicScoreEntry?.Manifest.singer);
+
+				int playLevel = difficulty?.playLevel ?? _model?.CustomMusicScoreEntry?.Manifest.playLevel ?? 0;
+
 				bootData.MusicData.Score = new MasterPlayLevelScore
 				{
 					liveType = LiveType.solo.ToString(),
-					playLevel = difficulty?.playLevel ?? _model?.CustomMusicScoreEntry?.Manifest.playLevel ?? 0
+					playLevel = playLevel,
+					s = 1040000 + ((Mathf.Clamp(playLevel, 5, 40) - 5) * 5200),
+					a = 840000 + ((Mathf.Clamp(playLevel, 5, 40) - 5) * 4200),
+					b = 400000 + ((Mathf.Clamp(playLevel, 5, 40) - 5) * 2000),
+					c = 20000 + ((Mathf.Clamp(playLevel, 5, 40) - 5) * 100)
 				};
+				bootData.DeckData.TotalPowerIncludeBuff = ApplicationLocalSettings.LoadFromStorage().TotalPower;
 				bootData.MusicData.IsTestPlay = true;
 				bootData.MusicData.IsUseCustomScore = true;
 				bootData.MusicData.CustomPlayLevel = difficulty?.playLevel ?? _model?.CustomMusicScoreEntry?.Manifest.playLevel ?? 0;
