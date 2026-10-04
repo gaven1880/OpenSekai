@@ -362,7 +362,7 @@ namespace Sekai
 			}
 
 			float startOffset = startNoteBase.CalcTimeOffset(startNoteBase);
-			float endOffset = endNote.State != NoteState.Wait ? endNoteBase.offsetTime : endNoteBase.CalcTimeOffset(endNoteBase);
+			float endOffset = endNoteBase.CalcTimeOffset(endNoteBase);
 			float duration = endNote.MusicScoreInfo.time - startNote.MusicScoreInfo.time;
 			if (Mathf.Approximately(startOffset, 0f) || Mathf.Approximately(endOffset, 0f) || Mathf.Approximately(duration, 0f))
 			{
