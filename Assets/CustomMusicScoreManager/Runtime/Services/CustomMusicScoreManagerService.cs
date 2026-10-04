@@ -71,8 +71,8 @@ namespace Sekai.CustomMusicScoreManager
 			CustomMusicScoreManifest manifest = new CustomMusicScoreManifest
 			{
 				id = CustomMusicScoreStorage.GenerateShortId(),
-				title = "未命名",
-				scoreTitle = "未命名谱面",
+				title = "無題",
+				scoreTitle = "無題の譜面",
 				userName = Environment.UserName,
 				composer = string.Empty,
 				lyricist = string.Empty,
@@ -107,7 +107,7 @@ namespace Sekai.CustomMusicScoreManager
 
 			CustomMusicScoreManifest manifest = CloneManifest(source.Manifest);
 			manifest.id = CustomMusicScoreStorage.GenerateShortId();
-			manifest.scoreTitle = string.IsNullOrWhiteSpace(manifest.scoreTitle) ? "副本" : manifest.scoreTitle + " 副本";
+			manifest.scoreTitle = string.IsNullOrWhiteSpace(manifest.scoreTitle) ? "コピー" : manifest.scoreTitle + " コピー";
 			manifest.Normalize();
 
 			string destination = GetUniqueDirectory(Path.Combine(CustomMusicScoreStorage.RootDirectory, CustomMusicScoreStorage.CreateFolderName(manifest)));
@@ -127,7 +127,7 @@ namespace Sekai.CustomMusicScoreManager
 			string target = Path.GetFullPath(entry.RootDirectory);
 			if (!target.StartsWith(root, StringComparison.OrdinalIgnoreCase))
 			{
-				throw new InvalidOperationException("拒绝删除 CustomMusicScores 外部的文件夹。");
+				throw new InvalidOperationException("CustomMusicScores 外部のフォルダの削除は許可されていません。");
 			}
 
 			Directory.Delete(target, true);
@@ -257,7 +257,7 @@ namespace Sekai.CustomMusicScoreManager
 			string extension = Path.GetExtension(sourcePath);
 			if (string.IsNullOrEmpty(extension) || !ScoreExtensions.Contains(extension))
 			{
-				throw new InvalidOperationException("不支持的谱面文件扩展名：" + extension);
+				throw new InvalidOperationException("対応していない譜面ファイル拡張子です：" + extension);
 			}
 
 			Directory.CreateDirectory(entry.RootDirectory);
@@ -394,7 +394,7 @@ namespace Sekai.CustomMusicScoreManager
 			string extension = ResolveSupportedExtension(sourcePath, allowedExtensions);
 			if (string.IsNullOrEmpty(extension) || !allowedExtensions.Contains(extension))
 			{
-				throw new InvalidOperationException("不支持的文件扩展名：" + extension);
+				throw new InvalidOperationException("対応していないファイル拡張子です：" + extension);
 			}
 
 			Directory.CreateDirectory(entry.RootDirectory);
@@ -442,7 +442,7 @@ namespace Sekai.CustomMusicScoreManager
 			if (!sourceTexture.LoadImage(sourceBytes))
 			{
 				UnityEngine.Object.Destroy(sourceTexture);
-				throw new InvalidOperationException("不支持的封面图片数据。");
+				throw new InvalidOperationException("対応していないジャケット画像データです。");
 			}
 
 			RenderTexture previous = RenderTexture.active;

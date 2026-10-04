@@ -8,8 +8,8 @@ namespace Sekai
 	public static class WordingManager
 	{
 		private const string REPLACE_CODE_COMMMA = "_x_COMMA_x_";
-		private const string WORDING_RESOURCE_PATH = "wording/wording_zh";
-		private const string MASTER_WORDING_RESOURCE_PATH = "wording/master_wording_zh";
+		private const string WORDING_RESOURCE_PATH = "wording/wording";
+		private const string MASTER_WORDING_RESOURCE_PATH = "wording/master_wording";
 
 		private static Dictionary<string, string> dictionary;
 
