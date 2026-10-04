@@ -98,6 +98,7 @@ namespace Sekai.CustomMusicScoreManager
 		private Button _editButton;
 		private Button _playButton;
 		private Button _autoButton;
+		private Button _APAutoButton;
 		private Button _duplicateButton;
 		private Button _deleteButton;
 		private Button _exportButton;
@@ -266,6 +267,7 @@ namespace Sekai.CustomMusicScoreManager
 			_editButton = CreateButton("EditButton", actionButtons, "編集", OpenEditor, ActionButtonWidth, ActionButtonHeight);
 			_playButton = CreateButton("PlayButton", actionButtons, "観光", PlaySelected, ActionButtonWidth, ActionButtonHeight);
 			_autoButton = CreateButton("AutoButton", actionButtons, "自動", AutoPlaySelected, ActionButtonWidth, ActionButtonHeight);
+			_APAutoButton = CreateButton("APAutoButton", actionButtons, "AP自動", APAutoPlaySelected, ActionButtonWidth, ActionButtonHeight);
 			_duplicateButton = CreateButton("DuplicateButton", actionButtons, "コピー", DuplicateSelected, ActionButtonWidth, ActionButtonHeight);
 			_exportButton = CreateButton("ExportButton", actionButtons, "ZIPとしてエクスポート", ExportSelected, ActionButtonWidth, ActionButtonHeight);
 			_deleteButton = CreateButton("DeleteButton", actionButtons, "削除", DeleteSelected, ActionButtonWidth, ActionButtonHeight, new Color32(110, 49, 57, 255));
@@ -543,6 +545,7 @@ namespace Sekai.CustomMusicScoreManager
 			_editButton.interactable = hasSelection && item.IsReadyForEdit;
 			_playButton.interactable = hasSelection && item.HasScore && item.HasAudio;
 			_autoButton.interactable = hasSelection && item.HasScore && item.HasAudio;
+			_APAutoButton.interactable = hasSelection && item.HasScore && item.HasAudio;
 			_duplicateButton.interactable = hasSelection;
 			_deleteButton.interactable = hasSelection;
 			_exportButton.interactable = hasSelection;
@@ -675,7 +678,12 @@ namespace Sekai.CustomMusicScoreManager
 			PlaySelectedAsync(true).Forget();
 		}
 
-		private async UniTask PlaySelectedAsync(bool isAuto)
+		private void APAutoPlaySelected()
+		{
+			PlaySelectedAsync(true, true).Forget();
+		}
+
+		private async UniTask PlaySelectedAsync(bool isAuto, bool isAPAuto = false)
 		{
 			if (_selected?.Entry == null)
 			{
@@ -722,7 +730,7 @@ namespace Sekai.CustomMusicScoreManager
 				return;
 			}
 
-			FreeLiveBootData bootData = CreateDirectPlayBootData(entry, score, isAuto);
+			FreeLiveBootData bootData = CreateDirectPlayBootData(entry, score, isAuto, isAPAuto);
 			if (bootData == null)
 			{
 				SetStatus("ゲームの起動データを作成できませんでした。");
@@ -741,7 +749,7 @@ namespace Sekai.CustomMusicScoreManager
 			return score?.NoteArray != null && score.NoteArray.ToList().Exists(note => note != null);
 		}
 
-		private FreeLiveBootData CreateDirectPlayBootData(CustomMusicScoreEntry entry, MusicScore score, bool isAuto)
+		private FreeLiveBootData CreateDirectPlayBootData(CustomMusicScoreEntry entry, MusicScore score, bool isAuto, bool isAPAuto)
 		{
 			if (entry == null || score == null)
 			{
@@ -770,6 +778,7 @@ namespace Sekai.CustomMusicScoreManager
 			bootData.MVQualityType = bootData.LiveSettingData?.QualityType ?? Sekai.MVQualityType.Default;
 			bootData.MusicCategory = musicCategory;
 			bootData.IsAuto = isAuto;
+			bootData.IsAPAuto = isAPAuto;
 			bootData.IsCustomMusicScore = true;
 			bootData.IsOfficialMusicScore = false;
 			bootData.ReturnScreenType = MenuScreenType.MusicScoreMakerTop;

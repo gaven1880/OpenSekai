@@ -265,7 +265,14 @@ namespace Sekai.Core.Live
 				{
 					break;
 				}
-				note.AutoJudgment(currentFrameInfo);
+				if (bootData?.IsAPAuto == true)
+				{
+					note.APAutoJudgment(currentFrameInfo);
+				}
+				else
+				{
+					note.AutoJudgment(currentFrameInfo);
+				}
 				index++;
 			}
 			int highSpeedIndex = highSpeedNoteStartIndex;
@@ -281,7 +288,14 @@ namespace Sekai.Core.Live
 				{
 					break;
 				}
-				note.AutoJudgment(currentFrameInfo);
+				if (bootData?.IsAPAuto == true)
+				{
+					note.APAutoJudgment(currentFrameInfo);
+				}
+				else
+				{
+					note.AutoJudgment(currentFrameInfo);
+				}
 				highSpeedIndex++;
 			}
 		}

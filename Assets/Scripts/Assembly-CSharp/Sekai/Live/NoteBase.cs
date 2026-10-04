@@ -526,6 +526,18 @@ namespace Sekai.Live
 			return true;
 		}
 
+		public virtual bool APAutoJudgment(MusicScoreInfo currentFrameInfo)
+		{
+			if (State == NoteState.Done || MusicScoreInfo.time > currentFrameInfo.time)
+			{
+				return false;
+			}
+
+			JudgeInfo = (NoteResult.Perfect, NoteResultDescription.None);
+			State = NoteState.Done;
+			return true;
+		}
+
 		public virtual void ResetNote()
 		{
 			State = NoteState.Wait;

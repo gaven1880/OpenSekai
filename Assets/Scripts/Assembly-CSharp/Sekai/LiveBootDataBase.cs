@@ -38,6 +38,8 @@ namespace Sekai
 
 		public bool IsAuto { get; set; }
 
+		public bool IsAPAuto { get; set; }
+
 		public bool IsCustomMusicScore { get; set; }
 
 		public LiveType LiveType { get; }

@@ -107,5 +107,10 @@ namespace Sekai.Live
 		{
 			return false;
 		}
+
+		public override bool APAutoJudgment(MusicScoreInfo currentFrameInfo)
+		{
+			return false;
+		}
 	}
 }

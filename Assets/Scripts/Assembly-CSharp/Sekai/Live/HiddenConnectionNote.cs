@@ -91,6 +91,20 @@ namespace Sekai.Live
 			return true;
 		}
 
+		public override bool APAutoJudgment(MusicScoreInfo currentFrameInfo)
+		{
+			if (State == NoteState.Done || MusicScoreInfo.time > currentFrameInfo.time)
+			{
+				return false;
+			}
+
+			OffsetJudgeTime = 0f;
+			Progress = 1f;
+			JudgeInfo = (NoteResult.Pass, NoteResultDescription.None);
+			State = NoteState.Done;
+			return true;
+		}
+
 		protected override void OnSpawnNote()
 		{
 		}

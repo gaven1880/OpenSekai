@@ -459,6 +459,45 @@ namespace Sekai.Live
 			}
 		}
 
+		public override bool APAutoJudgment(MusicScoreInfo currentFrameInfo)
+		{
+			if (State == NoteState.Done || MusicScoreInfo.time > currentFrameInfo.time)
+			{
+				return false;
+			}
+
+			lastInputFrame = Time.frameCount;
+			JudgeInfo = (NoteResult.Perfect, NoteResultDescription.None);
+			State = State == NoteState.Playing || State == NoteState.Last || State == NoteState.Release ? NoteState.InputBegan : NoteState.Input;
+			OffsetJudgeTime = 0f;
+			ConnectionNoteAPAutoJudgment(currentFrameInfo);
+
+			if (childNote != null && childNote.APAutoJudgment(currentFrameInfo))
+			{
+				State = NoteState.Done;
+			}
+
+			return true;
+		}
+
+		private void ConnectionNoteAPAutoJudgment(MusicScoreInfo currentFrameInfo)
+		{
+			if (State != NoteState.InputBegan && State != NoteState.Input)
+			{
+				return;
+			}
+
+			if (NoteList == null)
+			{
+				return;
+			}
+
+			for (var i = 1; i < NoteList.Count - 1; i++)
+			{
+				NoteList[i]?.APAutoJudgment(currentFrameInfo);
+			}
+		}
+
 		public override NoteResult CalcNoteResult(float musicTime)
 		{
 			return LiveConfig.CalculateLongStartNoteResult(this, musicTime).Item1;
