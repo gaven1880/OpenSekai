@@ -480,7 +480,7 @@ namespace Sekai.Core.Live
 
 		private bool IsJudgeTimingTimeOffsetNote(float timeOffset, NoteBase note)
 		{
-			if (note == null || Mathf.Approximately(timeOffset, 0f))
+			if (note == null || timeOffset <= 0f)
 			{
 				return false;
 			}
