@@ -21,3 +21,13 @@ OpenSekai 是一个用于学习和研究目的的 Project Sekai 音乐游戏玩�
 本仓库中的代码以 MIT 协议发布。第三方库、字体、音频、贴图、prefab、shader 参考资源以及任何可能来源于原作或其他权利方的资源，不自动包含在 MIT 授权范围内，请分别遵循其原始许可和权利归属。
 
 本项目与任何原作游戏、发行方或权利方没有官方关联。
+
+## Note
+From Gaven: I won't be contributing to this fork anymore, although there are a few bugs if anyone wants to take over.
+
+If you import a .SUS score file:
+- Long Hold Combo will not be present
+- (untested, though I think this is present) Mirror setting might not apply
+- A lot of bugs in Editor
+
+All of the previously mentioned bugs get fixed if you open the score in Editor, then exit Editor.
